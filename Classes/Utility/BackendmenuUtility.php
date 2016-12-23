@@ -1,4 +1,6 @@
 <?php
+namespace Kennziffer\KeStats\Utility;
+
 /***************************************************************
 *  Copyright notice
 *
@@ -34,7 +36,7 @@ use \TYPO3\CMS\Core\Utility\GeneralUtility;
 
 define (NULL_VALUE, 'EMPTYVALUE');
 
-class backendMenu {
+class BackendmenuUtility {
 	var $menuNames = array();
 
 	/**

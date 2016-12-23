@@ -1,4 +1,6 @@
 <?php
+namespace Kennziffer\KeStats\Controller;
+
 /***************************************************************
 *  Copyright notice
 *
@@ -29,7 +31,7 @@ define('UPDATED_UNTIL_DATEFORMAT', 'd.m.Y, H:i:s');
 	// DEFAULT initialization of a module [BEGIN]
 unset($MCONF);
 require_once('conf.php');
-require_once($BACK_PATH.'init.php');
+require_once($BACK_PATH.'deprecated.php');
 
 $GLOBALS['LANG']->includeLLFile('EXT:ke_stats/mod1/locallang.xml');
 $GLOBALS['BE_USER']->modAccess($MCONF,1);	// This checks permissions and exits if the users has no permission for entry.
@@ -45,7 +47,7 @@ require_once('../inc/constants.inc.php');
  * @package	TYPO3
  * @subpackage	tx_kestats
  */
-class  tx_kestats_module1 extends \TYPO3\CMS\Backend\Module\BaseScriptClass {
+class Module1Controller extends \TYPO3\CMS\Backend\Module\BaseScriptClass {
 	var $pageinfo;
 	var $tablename = 'tx_kestats_statdata';
 	var $tablenameCache = 'tx_kestats_cache';
@@ -60,6 +62,12 @@ class  tx_kestats_module1 extends \TYPO3\CMS\Backend\Module\BaseScriptClass {
 	var $csvDateFormat = 'd.m.Y';
 	var $decimalChar = ',';
 	var $overviewPageData = array();
+
+	public function __construct()
+	{
+		$this->getLanguageService()->includeLLFile('EXT:prototype/Resources/Private/Language/locallang.xlf');
+		$this->getBackendUser()->modAccess($GLOBALS['MCONF'], TRUE);
+	}
 
 	/**
 	 * Initializes the Module

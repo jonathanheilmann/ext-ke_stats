@@ -29,6 +29,16 @@ $TCA["tx_kestats_cache"] = array (
 */
 
 if (TYPO3_MODE == 'BE')	{
-	\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addModule('web','txkestatsM1','',\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath($_EXTKEY).'mod1/');
+	$tmp_moduleConfiguration = array(
+		'access' => 'user,group',
+		'extensionName' => 'KeStats',
+		'extRelPath' => '../typo3conf/ext/ke_stats/Classes/',
+		'icon' => 'EXT:ke_Stats/ext_icon.gif',
+		'labels' => 'LLL:EXT:ke_stats/mod1/locallang_mod.xml',
+		'name' => 'web_txkestatsM1',
+		'navigationComponentId' => 'typo3-pagetree',
+		'vendorName' => 'Kennziffer'
+	);
+
+	\TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addModule('web', 'txkestatsM1', '', \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extPath($_EXTKEY).'Classes/Controller/index.php', $tmp_moduleConfiguration);
 }
-?>
