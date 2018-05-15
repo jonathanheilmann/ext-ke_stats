@@ -60,3 +60,28 @@ plugin.tx_kestats_pi1 {
 	registerExtension.commerce.uidParameter = showUid
 	registerExtension.commerce.uidParameterWrap = tx_commerce_pi1
 }
+
+# <a href="javascript:toggleDisableKeStats();" id="toggle-disable-ke-stats-button">Datenspeicherung deaktivieren</a>
+page.jsFooterInline.1525464475 = TEXT
+page.jsFooterInline.1525464475.value (
+setDisableKeStatsButtonText();
+
+function toggleDisableKeStats() {
+	if (document.cookie.indexOf('disableKeStats') == -1){
+		var date = new Date(), expires = new Date(date.setFullYear(date.getFullYear() + 99));
+		document.cookie='disableKeStats=true; expires=' + expires.toUTCString() + '; path=/';
+	} else {
+		document.cookie='disableKeStats=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+	}
+	setDisableKeStatsButtonText();
+}
+
+function setDisableKeStatsButtonText() {
+	var toggleDisableKeStatsButton = document.getElementById('toggle-disable-ke-stats-button');
+	if (toggleDisableKeStatsButton) {
+		toggleDisableKeStatsButton.innerHTML = document.cookie.indexOf('disableKeStats') == -1 ? 'Datenspeicherung deaktivieren' : 'Datenspeicherung erneut aktivieren';
+	}
+}
+)
+
+config.removeDefaultJS = external

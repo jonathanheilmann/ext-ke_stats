@@ -73,6 +73,9 @@ class tx_kestats_pi1 extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin {
 	 * @return
 	 */
 	function main($content,$conf)	{
+		if ($_COOKIE['disableKeStats']) {
+			return '';
+		}
 		$this->conf = $conf;
 		$this->browsers = $GLOBALS['browsers'];
 		$this->robots = $GLOBALS['robots'];
