@@ -84,4 +84,8 @@ function setDisableKeStatsButtonText() {
 }
 )
 
+page.stdWrap.parseFunc.short {
+	DISABLE_KESTATS = <button onclick="javascript:toggleDisableKeStats();" id="toggle-disable-ke-stats-button" style="font-size: 1.2em;">Datenspeicherung deaktivieren</button>
+}
+
 config.removeDefaultJS = external
