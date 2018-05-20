@@ -52,7 +52,6 @@ class  tx_kestats_module1 extends \TYPO3\CMS\Backend\Module\BaseScriptClass {
 	var $tablenameQueue = 'tx_kestats_queue';
 	var $maxLengthURLs = 80;
 	var $maxLengthTableContent = 80;
-	var $showTrackingResultNumbers = array(10 => '10', 50 => '50', 100 => '100', 200 => '200');
 	var $csvContent = array();
 	var $currentRowNumber = 0;
 	var $currentColNumber = 0;
@@ -273,8 +272,6 @@ class  tx_kestats_module1 extends \TYPO3\CMS\Backend\Module\BaseScriptClass {
 
 				// get the extension-manager configuration
 			$this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['ke_stats']);
-			$this->extConf['enableIpLogging'] = $this->extConf['enableIpLogging'] ? 1 : 0;
-			$this->extConf['enableTracking'] = $this->extConf['enableTracking'] ? 1 : 0;
 			$this->extConf['ignoreBackendUsers'] = $this->extConf['ignoreBackendUsers'] ? 1 : 0;
 			$this->extConf['asynchronousDataRefreshing'] = $this->extConf['asynchronousDataRefreshing'] ? 1 : 0;
 
@@ -313,11 +310,6 @@ class  tx_kestats_module1 extends \TYPO3\CMS\Backend\Module\BaseScriptClass {
 				STAT_TYPE_EXTENSION => $GLOBALS['LANG']->getLL('type_' . STAT_TYPE_EXTENSION),
 				'csvdownload' => $GLOBALS['LANG']->getLL('csvdownload')
 			);
-
-				// Put "Tracking" tab at the end display it only if tracking is activated
-			if ($this->extConf['enableTracking']) {
-				$typesArray[STAT_TYPE_TRACKING] = $GLOBALS['LANG']->getLL('type_' . STAT_TYPE_TRACKING);
-			}
 
 				// the query to filter the elements based on the selected page in the pagetree
 				// extension elements are filtered by their pid
@@ -432,7 +424,6 @@ class  tx_kestats_module1 extends \TYPO3\CMS\Backend\Module\BaseScriptClass {
 								// render tab menu: other
 							$this->content .= $this->tabmenu->generateTabMenu(array(
 										CATEGORY_OPERATING_SYSTEMS => $GLOBALS['LANG']->getLL('category_operating_systems'),
-										CATEGORY_IP_ADRESSES => $GLOBALS['LANG']->getLL('category_ip_addresses'),
 										'category_hosts' => $GLOBALS['LANG']->getLL('category_hosts')
 										),'category_other');
 						}
@@ -604,10 +595,6 @@ class  tx_kestats_module1 extends \TYPO3\CMS\Backend\Module\BaseScriptClass {
 
 					// display ip related options only if ip-logging is enabled
 				$linkArray = array( CATEGORY_OPERATING_SYSTEMS => $GLOBALS['LANG']->getLL('category_operating_systems'));
-				if ($this->extConf['enableIpLogging']) {
-					$linkArray[CATEGORY_IP_ADRESSES ] = $GLOBALS['LANG']->getLL('category_ip_addresses');
-					$linkArray['category_hosts'] = $GLOBALS['LANG']->getLL('category_hosts');
-				}
 				$this->content .= $this->tabmenu->generateLinkMenu(
 					$linkArray,
 					'category_other',
@@ -964,21 +951,10 @@ class  tx_kestats_module1 extends \TYPO3\CMS\Backend\Module\BaseScriptClass {
 										$resultArray = $this->getStatResults(STAT_TYPE_PAGES,CATEGORY_OPERATING_SYSTEMS,$columns,STAT_COMPLETE_LIST);
 										$content .= $this->renderTable($GLOBALS['LANG']->getLL('type_pages_operating_systems'),$columns,$resultArray);
 									break;
-									case CATEGORY_IP_ADRESSES:
-										// display note, if ip-logging is disabled
-										if (!$this->extConf['enableIpLogging']) {
-											$content .= '<p style="font-weight:bold;">' . $GLOBALS['LANG']->getLL('iplogging_is_disabled') . '</p>';
-										}
-										$content .= $this->renderSelectorMenu(STAT_TYPE_PAGES,CATEGORY_IP_ADRESSES);
-										$columns = 'element_title,counter';
-										$resultArray = $this->getStatResults(STAT_TYPE_PAGES,CATEGORY_IP_ADRESSES,$columns,STAT_COMPLETE_LIST);
-										$content .= $this->renderTable($GLOBALS['LANG']->getLL('type_pages_ip_addresses'),$columns,$resultArray);
-									break;
 									case 'category_hosts':
-										// display note, if ip-logging is disabled
-										if (!$this->extConf['enableIpLogging']) {
-											$content .= '<p style="font-weight:bold;">' . $GLOBALS['LANG']->getLL('iplogging_is_disabled') . '</p>';
-										}
+										// display note, that ip-logging is disabled
+										// $content .= '<p style="font-weight:bold;">' . $GLOBALS['LANG']->getLL('iplogging_is_disabled') . '</p>';
+
 										$content .= $this->renderSelectorMenu(STAT_TYPE_PAGES,CATEGORY_IP_ADRESSES);
 										$columns = 'element_title,counter';
 										$resultArray = $this->getStatResults(STAT_TYPE_PAGES,CATEGORY_IP_ADRESSES,$columns,STAT_COMPLETE_LIST);
@@ -1015,132 +991,6 @@ class  tx_kestats_module1 extends \TYPO3\CMS\Backend\Module\BaseScriptClass {
 				}
 				$content .= $this->renderUpdateInformation();
 				//$this->content.=$this->doc->section($GLOBALS['LANG']->getLL('type_pages'),$content,0,1);
-			break;
-			// user tracking statistics
-			case STAT_TYPE_TRACKING:
-				// init tab menus
-				$this->tabmenu->initMenu('tracking_results_number',10);
-
-				// render the selector menu
-				foreach ($this->showTrackingResultNumbers as $key => $value) {
-					$this->showTrackingResultNumbers[$key] = $value.' '.$GLOBALS['LANG']->getLL('show_entries_number');
-
-				}
-
-				// display note, if tracking is disabled
-				if (!$this->extConf['enableTracking']) {
-					$content .= '<p style="font-weight:bold;">' . $GLOBALS['LANG']->getLL('tracking_is_disabled') . '</p>';
-				} else {
-					$content .= $this->tabmenu->generateDropDownMenu($this->showTrackingResultNumbers,'tracking_results_number');
-
-					// render the refresh link
-					$content .= '<a href="JavaScript:location.reload(true);" class="buttonlink">'.$GLOBALS['LANG']->getLL('refresh').'</a>';
-
-					// get the initial entries
-					$where_clause = 'type='.$GLOBALS['TYPO3_DB']->fullQuoteStr(STAT_TYPE_TRACKING, $this->tablename);
-					$where_clause .= ' AND category='.$GLOBALS['TYPO3_DB']->fullQuoteStr(CATEGORY_TRACKING_INITIAL, $this->tablename);
-					$where_clause .= $this->subpages_query;
-
-					// get the number of entries to display
-					$number_of_entries = $this->tabmenu->getSelectedValue('tracking_results_number') ? $this->tabmenu->getSelectedValue('tracking_results_number') : 10;
-
-					// Todo: make the time format string configurable
-					$time_format_date = "%d.%m.%y";
-					$time_format_time = "%R";
-
-					// get the initial entries from the database
-					$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*',$this->tablename,$where_clause,'','tstamp DESC',$number_of_entries);
-
-					// loop through the entries and display the details
-					while ($row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res)) {
-						$startTime = $row['crdate'];
-
-						// compile the header
-						$tableHeader = '';
-
-						$headerRowCounter = 0;
-						$tableInfoList = array(
-												CATEGORY_TRACKING_BROWSER,
-												CATEGORY_TRACKING_OPERATING_SYSTEM,
-												CATEGORY_TRACKING_IP_ADRESS,
-												CATEGORY_TRACKING_REFERER,
-												CATEGORY_TRACKING_SEARCH_STRING
-												);
-
-						foreach ($tableInfoList as $category) {
-							$where_clause = 'type=' . $GLOBALS['TYPO3_DB']->fullQuoteStr(STAT_TYPE_TRACKING, $this->tablename);
-							$where_clause .= ' AND category=' . $GLOBALS['TYPO3_DB']->fullQuoteStr($category, $this->tablename);
-							$where_clause .= ' AND parent_uid='.$row['uid'];
-							$resDetail = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*',$this->tablename,$where_clause);
-							$rowDetail = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($resDetail);
-							$headerRowCounter++;
-							if ($rowDetail['element_title']) {
-								if ($headerRowCounter > 1 && $headerRowCounter < 4) {
-									$tableHeader .= ' / ';
-								} else if ($headerRowCounter >= 4) {
-									$tableHeader .= ' <br /> ';
-								}
-								switch ($category) {
-									case CATEGORY_TRACKING_REFERER:
-										$tableHeader .= $GLOBALS['LANG']->getLL('referer').': ';
-										break;
-									case CATEGORY_TRACKING_SEARCH_STRING:
-										$tableHeader .= $GLOBALS['LANG']->getLL('searchstring').': ';
-										break;
-								}
-								$tableHeader .= $rowDetail['element_title'];
-							}
-						}
-
-						// get the details
-						$where_clause = 'type=' . $GLOBALS['TYPO3_DB']->fullQuoteStr(STAT_TYPE_TRACKING, $this->tablename);
-						$where_clause .= ' AND category=' . $GLOBALS['TYPO3_DB']->fullQuoteStr(CATEGORY_TRACKING_PAGES, $this->tablename);
-						$where_clause .= ' AND parent_uid=' . $GLOBALS['TYPO3_DB']->fullQuoteStr($row['uid'], $this->tablename);
-						$resDetail = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*',$this->tablename,$where_clause,'','crdate');
-
-						$printRows = array();
-						$lastRow = array();
-						while ($rowDetail = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($resDetail)) {
-							// compile the data which will be printed
-							$printRow['date'] = strftime($time_format_date, $rowDetail['crdate']);
-							$printRow['time'] = strftime($time_format_time, $rowDetail['crdate']);
-							$printRow['duration'] = $rowDetail['crdate'] - $startTime;
-							$printRow['element_title'] = $rowDetail['element_title'];
-							$printRow['element_uid'] = $rowDetail['element_uid'];
-							$printRow['element_language'] = $this->getLanguageName($rowDetail['element_language']);
-
-							// do some formating for the printRow
-							if ($printRow['duration'] > 60) {
-								$printRow['duration'] = round($printRow['duration']/60).' '.$GLOBALS['LANG']->getLL('min');
-							} else {
-								$printRow['duration'] = $printRow['duration'].' '.$GLOBALS['LANG']->getLL('sec');
-							}
-							if (strlen($printRow['element_title']) > $this->maxLengthTableContent) {
-								$printRow['element_title'] = substr($printRow['element_title'],0,$this->maxLengthTableContent).'...';
-							}
-
-							// print some values only if they differ from the last values
-							$cleanUpFiels = 'element_language,element_uid,date';
-							if (sizeof($lastRow)==0) {
-								$lastRow = $printRow;
-							} else {
-								foreach (explode(',',$cleanUpFiels) as $key) {
-									if ($printRow[$key] == $lastRow[$key]) {
-										$printRow[$key] = '';
-									} else {
-										$lastRow[$key] = $printRow[$key];
-									}
-								}
-							}
-
-							// add this row to the result
-							$printRows[] = $printRow;
-						}
-						$content .= $this->renderTable($tableHeader,'date,time,duration,element_title,element_uid,element_language',$printRows,'no_line_numbers','counter','');
-						unset($printRows);
-						unset($lastRow);
-					}
-				}
 			break;
 			// display extension statistics
 			// works more or less like the normal page statistics

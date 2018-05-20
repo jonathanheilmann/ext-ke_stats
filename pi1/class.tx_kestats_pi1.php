@@ -50,9 +50,6 @@ class tx_kestats_pi1 extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin {
 	// The main table.
 	var $tableName = 'tx_kestats_statdata';
 
-	// keep the tracking entries only a certain number of days, delete them after that.
-	var $keepTrackingEntriesDays = 60;
-
 	// for debugging purposes:
 	var $debug_email = '';
 	var $debug_mail_if_unknown = 0;
@@ -126,8 +123,6 @@ class tx_kestats_pi1 extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin {
 
 			// get the extension-manager configuration
 		$this->extConf = unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['ke_stats']);
-		$this->extConf['enableIpLogging'] = $this->extConf['enableIpLogging'] ? 1 : 0;
-		$this->extConf['enableTracking'] = $this->extConf['enableTracking'] ? 1 : 0;
 		$this->extConf['ignoreBackendUsers'] = $this->extConf['ignoreBackendUsers'] ? 1 : 0;
 		$this->extConf['ignoreRobots'] = $this->extConf['ignoreRobots'] ? 1 : 0;
 		$this->extConf['ipFilter'] = $this->extConf['ipFilter'] ? $this->sanitizeData($this->extConf['ipFilter']) : '';
@@ -227,78 +222,6 @@ class tx_kestats_pi1 extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin {
 		}
 
 		//***********************************************
-		// TRACK Visitor
-		//***********************************************
-
-		if (!$this->statData['is_robot'] && $this->extConf['enableTracking']) {
-
-				// get the uid of the initial entry
-			$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid',$this->tableName,'element_title=\''.$GLOBALS['TSFE']->fe_user->id.'\'');
-			$this->debug_queries[] = $GLOBALS['TYPO3_DB']->SELECTquery('uid',$this->tableName,'element_title=\''.$GLOBALS['TSFE']->fe_user->id.'\'');
-
-			if ($GLOBALS['TYPO3_DB']->sql_num_rows($res) == 0) {
-
-					// this is the first hit of this user
-					// so create the initial entry
-				$this->increaseCounter(CATEGORY_TRACKING_INITIAL,'element_uid,element_title,year,month',$GLOBALS['TSFE']->fe_user->id,$element_uid,0,$element_language,$element_type,STAT_TYPE_TRACKING);
-
-					// get the uid of the initial entry
-					// don't use sql_insert_id, because there may have been more insert operations in between
-				$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('uid',$this->tableName,'element_title=\''.$GLOBALS['TSFE']->fe_user->id.'\'');
-				$this->debug_queries[] = $GLOBALS['TYPO3_DB']->SELECTquery('uid',$this->tableName,'element_title=\''.$GLOBALS['TSFE']->fe_user->id.'\'');
-				$row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
-				$parent_uid = $row['uid'];
-
-					// track some more info about the visitor
-					// track browser
-				$this->increaseCounter(CATEGORY_TRACKING_BROWSER,'element_uid,element_title,year,month',$this->statData['user_agent_name'],$element_uid,0,0,0,STAT_TYPE_TRACKING,$parent_uid);
-
-					// track operating system
-				$this->increaseCounter(CATEGORY_TRACKING_OPERATING_SYSTEM,'element_uid,element_title,year,month',$this->statData['operating_system'],$element_uid,0,0,0,STAT_TYPE_TRACKING,$parent_uid);
-
-					// track ip addresse if ip-logging is enabled
-				if ($this->extConf['enableIpLogging']) {
-					$this->increaseCounter(CATEGORY_TRACKING_IP_ADRESS,'element_uid,element_title,year,month',$this->statData['remote_addr'],$element_uid,0,0,0,STAT_TYPE_TRACKING,$parent_uid);
-				}
-
-					// track referer and search string
-				if (!empty($this->statData['http_referer'])) {
-					if ($this->statData['referer_is_search_engine']) {
-						$this->increaseCounter(CATEGORY_TRACKING_REFERER,'element_uid,element_title,year,month',$this->statData['referer_name'],$element_uid,0,0,0,STAT_TYPE_TRACKING,$parent_uid);
-
-							// track search strings
-						$this->increaseCounter(CATEGORY_TRACKING_SEARCH_STRING,'element_uid,element_title,year,month',$this->getSearchwordFromReferer($this->statData['http_referer']),$element_uid,0,0,0,STAT_TYPE_TRACKING,$parent_uid);
-					} else {
-							// track only external sites
-							// TODO: make the list of hostnames, that won't be counted extendable via typoscript.
-						$refererHost = $this->getHostnameWithoutWWW($this->statData['referer_name']);
-						$currentHost = $this->getHostnameWithoutWWW($this->statData['http_host']);
-						if ($refererHost <> $currentHost) {
-							$this->increaseCounter(CATEGORY_TRACKING_REFERER,'element_uid,element_title,year,month',$this->statData['http_referer'],$element_uid,0,0,0,STAT_TYPE_TRACKING,$parent_uid);
-						}
-					}
-				}
-			} else {
-				$row = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res);
-				$parent_uid = $row['uid'];
-
-					// update the time stamp of the initial entry in order to make this visitor appear at the top of the list
-				$res = $GLOBALS['TYPO3_DB']->exec_UPDATEquery($this->tableName,'uid = '.$parent_uid,array('tstamp' => $this->now));
-				$this->debug_queries[] = $GLOBALS['TYPO3_DB']->UPDATEquery($this->tableName,'uid = '.$parent_uid,array('tstamp' => $this->now));
-			}
-
-				// TRACK this visitor (page view)
-			$this->increaseCounter(CATEGORY_TRACKING_PAGES,'element_uid,element_pid,element_language,element_type,year,month',$element_title,$element_uid,$element_pid,$element_language,$element_type,STAT_TYPE_TRACKING,$parent_uid);
-
-				// delete older tracking entries
-			$where = 'type = \''.STAT_TYPE_TRACKING.'\' AND tstamp < '. ($this->now - $this->keepTrackingEntriesDays * 24 * 60 * 60);
-			$res = $GLOBALS['TYPO3_DB']->exec_DELETEquery($this->tableName,$where);
-			$this->debug_queries[] = $GLOBALS['TYPO3_DB']->DELETEquery($this->tableName,$where);
-				//debug('deleting tracking entries older than '.strftime('%d.%m.%y %R',($this->now - $this->keepTrackingEntriesDays * 24 * 60 * 60)));
-				//debug($GLOBALS['TYPO3_DB']->sql_affected_rows.' were affected by delete-query.');
-		}
-
-		//***********************************************
 		// Count DETAILS
 		//***********************************************
 
@@ -310,11 +233,6 @@ class tx_kestats_pi1 extends \TYPO3\CMS\Frontend\Plugin\AbstractPlugin {
 
 					// count operating systems
 				$this->increaseCounter(CATEGORY_OPERATING_SYSTEMS,'element_uid,element_title,year,month',$this->statData['operating_system'],$element_uid);
-
-					// count ip addresse if ip-logging is enabled
-				if ($this->extConf['enableIpLogging']) {
-					$this->increaseCounter(CATEGORY_IP_ADRESSES,'element_uid,element_title,year,month',$this->statData['remote_addr'],$element_uid);
-				}
 
 					// count referers
 				if (!empty($this->statData['http_referer'])) {

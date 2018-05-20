@@ -4,7 +4,6 @@ plugin.tx_kestats_pi1 {
 
 	# enable all statistic types (set this to 0 to disable them)
 	enableStatisticsPages = 1
-	enableStatisticsTracking = 1
 	enableStatisticsExtensions = 1
 
 	# setup statistics for tt_news

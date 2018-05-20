@@ -35,7 +35,6 @@ define(UNKNOWN_OPERATING_SYSTEM,'unknown');
 define(EMPTY_USER_AGENT,'empty');
 
 define(STAT_TYPE_PAGES,'pages');
-define(STAT_TYPE_TRACKING,'tracking');
 define(STAT_TYPE_EXTENSION,'extension');
 
 define(CATEGORY_PAGES,'pages');
@@ -58,20 +57,11 @@ define(CATEGORY_VISITS_OVERALL_FEUSERS_HOUR_OF_DAY,'visits_overall_feusers_hour_
 
 define(CATEGORY_BROWSERS,'browsers');
 define(CATEGORY_OPERATING_SYSTEMS,'operating_systems');
-define(CATEGORY_IP_ADRESSES,'ip_addresses');
 define(CATEGORY_UNKNOWN_USER_AGENTS,'unknown_user_agents');
 define(CATEGORY_REFERERS_SEARCHENGINES,'referers_searchengines');
 define(CATEGORY_SEARCH_STRINGS,'search_strings');
 define(CATEGORY_REFERERS_EXTERNAL_WEBSITES,'referers_external_websites');
 define(CATEGORY_ROBOTS,'robots');
-
-define(CATEGORY_TRACKING_INITIAL,'initial');
-define(CATEGORY_TRACKING_PAGES,'pages');
-define(CATEGORY_TRACKING_BROWSER,'browser');
-define(CATEGORY_TRACKING_OPERATING_SYSTEM,'os');
-define(CATEGORY_TRACKING_IP_ADRESS,'ip');
-define(CATEGORY_TRACKING_REFERER,'referer');
-define(CATEGORY_TRACKING_SEARCH_STRING,'searchstring');
 
 define(STAT_ONLY_SUM,1);
 define(STAT_COMPLETE_LIST,0);

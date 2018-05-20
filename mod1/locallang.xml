@@ -45,7 +45,6 @@
 			<label index="category_referers_search_engines">Search Enginges</label>
 			<label index="category_referers_websites">Websites</label>
 			<label index="category_referers">Referers</label>
-			<label index="category_ip_addresses">IP Addresses</label>
 			<label index="category_operating_systems">Operating Systems</label>
 			<label index="category_user_agents">Browsers/Robots</label>
 			<label index="category_unknown_user_agents">Unknown User Agents</label>
@@ -76,7 +75,6 @@
 			<label index="no_data">No data found.</label>
 
 			<label index="type_pages">Pages</label>
-			<label index="type_tracking">Live Tracking</label>
 			<label index="type_extension">Extensions</label>
 			<label index="csvdownload">CSV-Download</label>
 			<label index="csvdownload_filename">TYPO3-Statistics_###DATE###.csv</label>
@@ -105,7 +103,6 @@
 			<label index="type_pages_user_agents_browsers">Pageviews (user agents: browsers)</label>
 			<label index="type_pages_user_agents_robots">Pageviews (robots)</label>
 			<label index="type_pages_user_agents_unknown">Pageviews (unknown user agents)</label>
-			<label index="type_pages_ip_addresses">Pageviews (ip addresses of the visitors)</label>
 			<label index="type_pages_operating_systems">Pageviews (operating systems of the visitors)</label>
 			<label index="type_pages_hosts">Pageviews (hosts of the visitors)</label>
 			<label index="type_pages_monhthly">Pageviews (pageviews per month)</label>
@@ -144,9 +141,6 @@
 			<label index="and_subpages">and all subpages.</label>
 			<label index="all_pages">Statistics for all pages. Please select a page in the pagetree to filter pages.</label>
 			<label index="please_select_page">Please select a page in the pagetree.</label>
-
-			<label index="iplogging_is_disabled">IP-Logging is disabled. You may enable it in the extension manager.</label>
-			<label index="tracking_is_disabled">Tracking is disabled. You may enable it in the extension-manager.</label>
 
 			<label index="updated_until">Updated until: </label>
 			<label index="last_update">Last update: </label>
@@ -197,7 +191,6 @@
 			<label index="category_referers_search_engines">Suchmaschinen</label>
 			<label index="category_referers_websites">Websites</label>
 			<label index="category_referers">Herkunft</label>
-			<label index="category_ip_addresses">IP-Adressen</label>
 			<label index="category_operating_systems">Betriebssysteme</label>
 			<label index="category_user_agents">Browser/Roboter</label>
 			<label index="category_unknown_user_agents">Unbekannte User Agents</label>
@@ -228,7 +221,6 @@
 			<label index="no_data">Keine Daten vorhanden.</label>
 
 			<label index="type_pages">Seiten</label>
-			<label index="type_tracking">Live Tracking</label>
 			<label index="type_extension">Erweiterungen</label>
 			<label index="csvdownload">CSV-Download</label>
 			<label index="csvdownload_filename">TYPO3-Statistik_###DATE###.csv</label>
@@ -260,7 +252,6 @@
 			<label index="type_pages_user_agents_browsers">Seitenaufrufe (User Agent: Browser)</label>
 			<label index="type_pages_user_agents_robots">Seitenaufrufe (Roboter)</label>
 			<label index="type_pages_user_agents_unknown">Seitenaufrufe (unbekannte User Agents)</label>
-			<label index="type_pages_ip_addresses">Seitenaufrufe (IP-Adressen der Besucher)</label>
 			<label index="type_pages_operating_systems">Seitenaufrufe (Betriebssysteme der Besucher)</label>
 			<label index="type_pages_hosts">Seitenaufrufe (Hostnamen der Besucher)</label>
 			<label index="type_pages_monthly">Seitenaufrufe (pro Monat)</label>
@@ -302,9 +293,6 @@
 			<label index="and_subpages">und alle Unterseiten.</label>
 			<label index="all_pages">Statistik für alle Seiten. Bitte wählen Sie im Seitenbaum eine Seite aus, um die Seite als Filter zu verwenden.</label>
 			<label index="please_select_page">Bitte wählen Sie im Seitenbaum eine Seite aus.</label>
-
-			<label index="iplogging_is_disabled">IP-Logging ist deaktiviert. Sie können es im Extension-Manager aktivieren.</label>
-			<label index="tracking_is_disabled">Die Tracking-Funktion ist deaktiviert. Sie können sie im Extension-Manager aktivieren.</label>
 
 			<label index="updated_until">Aktualisiert bis: </label>
 			<label index="last_update">Zuletzt aktualisiert: </label>
